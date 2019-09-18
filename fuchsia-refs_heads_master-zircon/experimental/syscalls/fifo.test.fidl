@@ -1,0 +1,29 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// !!! THIS FILE IS NOT YET USED !!!
+// See //zircon/system/public/zircon/syscalls.banjo.
+// !!! THIS FILE IS NOT YET USED !!!
+
+library zz;
+
+[Transport="Syscall"]
+protocol Fifo {
+    /// Create a fifo.
+    Create(usize elem_count, usize elem_size, uint32 options) ->
+        (status status, handle<fifo> out0, handle<fifo> out1);
+
+    // Note: |data| isn't a vector because its size in bytes is
+    // elem_size*count (i.e. vector<T> but runtime-determined T)
+    /// Read data from a fifo.
+    [In0="handle<fifo>:rights=READ"]
+    Read(handle<fifo> handle, usize elem_size, voidptr data, usize count) ->
+        (status status, optional_usize actual_count);
+
+    // Note: Same as above regarding |data|.
+    /// Write data to a fifo.
+    [In0="handle<fifo>:rights=WRITE"]
+    Write(handle<fifo> handle, usize elem_size, const_voidptr data, usize count) ->
+        (status status, optional_usize actual_count);
+};

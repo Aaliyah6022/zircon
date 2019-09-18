@@ -1,0 +1,92 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+group("test") {
+  testonly = true
+  deps = [
+    ":usb-virtual-bus-cdc-acm",
+    ":usb-virtual-bus-ftdi",
+    ":usb-virtual-bus-hid",
+    ":usb-virtual-bus-ums",
+  ]
+}
+
+test("usb-virtual-bus-ums") {
+  sources = [
+    "main.cc",
+    "ums-test.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-hardware-block:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-peripheral:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-peripheral-block:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-virtual-bus:llcpp",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/fidl-async",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/usb-virtual-bus-launcher",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+test("usb-virtual-bus-hid") {
+  sources = [
+    "usb-hid-test.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-hardware-input:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-peripheral:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-virtual-bus:llcpp",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/hid",
+    "$zx/system/ulib/usb-virtual-bus-launcher",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+test("usb-virtual-bus-ftdi") {
+  sources = [
+    "ftdi-test.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-hardware-usb-peripheral:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-virtual-bus:llcpp",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/hid",
+    "$zx/system/ulib/usb-virtual-bus-launcher",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+test("usb-virtual-bus-cdc-acm") {
+  sources = [
+    "usb-cdc-acm-test.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-hardware-usb-peripheral:llcpp",
+    "$zx/system/fidl/fuchsia-hardware-usb-virtual-bus:llcpp",
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/hid",
+    "$zx/system/ulib/usb-virtual-bus-launcher",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+}

@@ -1,0 +1,92 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/fuzzer.gni")
+group("test") {
+  testonly = true
+  deps = [
+    ":blobfs-integration",
+    ":blobfs-unit",
+    ":zstd-fuzzer",
+  ]
+}
+
+test("blobfs-unit") {
+  test_group = "fs"
+  sources = [
+    "unit/allocated-extent-iterator-test.cc",
+    "unit/allocator-test.cc",
+    "unit/blob-cache-test.cc",
+    "unit/blobfs-test.cc",
+    "unit/compressor-test.cc",
+    "unit/create-tests.cc",
+    "unit/extent-reserver-test.cc",
+    "unit/format-test.cc",
+    "unit/get-allocated-regions-test.cc",
+    "unit/node-populator-test.cc",
+    "unit/node-reserver-test.cc",
+    "unit/utils.cc",
+    "unit/vector-extent-iterator-test.cc",
+  ]
+  deps = [
+    "$zx/system/ulib/async-loop",
+    "$zx/system/ulib/async-loop:async-loop-cpp",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/blobfs",
+    "$zx/system/ulib/block-client:fake-device",
+    "$zx/system/ulib/fidl-utils",
+    "$zx/system/ulib/fs/buffer",
+    "$zx/system/ulib/fs/operation",
+    "$zx/system/ulib/zxtest",
+    "$zx/third_party/ulib/cksum",
+    "$zx/third_party/ulib/safemath",
+  ]
+
+  include_dirs = [ ".." ]
+}
+
+test("blobfs-host") {
+  sources = [
+    "host/host-test.cc",
+  ]
+  deps = [
+    "$zx/system/ulib/blobfs",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+test("blobfs-integration") {
+  test_group = "fs"
+  sources = [
+    "integration/blobfs_integration_test.cc",
+    "integration/blobfs_fixtures.cc",
+    "integration/environment.cc",
+    "integration/fixtures.cc",
+    "integration/integration_main.cc",
+    "integration/test_support.cc",
+  ]
+  deps = [
+    "$zx/system/fidl/fuchsia-device:c",
+    "$zx/system/fidl/fuchsia-hardware-block:c",
+    "$zx/system/fidl/fuchsia-io:c",
+    "$zx/system/ulib/async-loop",
+    "$zx/system/ulib/async-loop:async-loop-default.static",
+    "$zx/system/ulib/blobfs",
+    "$zx/system/ulib/fs-management",
+    "$zx/system/ulib/fs-test-utils",
+    "$zx/system/ulib/fvm",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/memfs",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+fuzzer("zstd-fuzzer") {
+  sources = [
+    "zstd-fuzzer.cc",
+  ]
+  deps = [
+    "$zx/system/ulib/blobfs",
+  ]
+}

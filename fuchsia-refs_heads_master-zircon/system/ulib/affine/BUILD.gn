@@ -1,0 +1,26 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/library_shim.gni")
+
+library("affine") {
+  sdk = "source"
+  sdk_headers = [
+    "lib/affine/ratio.h",
+    "lib/affine/transform.h",
+    "lib/affine/assert.h",
+    "lib/affine/utils.h",
+  ]
+
+  host = true
+  kernel = true
+  static = true
+
+  sources = [
+    "ratio.cc",
+    "transform.cc",
+  ]
+
+  configs += [ "$zx_build/public/gn/config:visibility_hidden"]
+}

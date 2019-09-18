@@ -1,0 +1,80 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+#pragma once
+
+#include <string>
+
+#include <fbl/macros.h>
+#include <fbl/unique_fd.h>
+#include <fs-management/mount.h>
+#include <zxtest/zxtest.h>
+
+#include "environment.h"
+
+constexpr uint8_t kTestUniqueGUID[] = {0xFF, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                                       0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f};
+
+constexpr uint8_t kTestPartGUID[] = {0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                                     0xFF, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+enum class FsTestType {
+  kGeneric,  // Use a generic block device.
+  kFvm       // Use an FVM device.
+};
+
+class FilesystemTest : public zxtest::Test {
+ public:
+  explicit FilesystemTest(FsTestType type = FsTestType::kGeneric);
+
+  // zxtest::Test interface:
+  void SetUp() override;
+  void TearDown() override;
+
+  // Unmounts and remounts the filesystem.
+  void Remount();
+
+  void set_read_only(bool read_only) { read_only_ = read_only; }
+  const std::string& device_path() const { return device_path_; }
+  disk_format_type format_type() const { return environment_->format_type(); }
+  const char* mount_path() const { return environment_->mount_path(); }
+
+  DISALLOW_COPY_ASSIGN_AND_MOVE(FilesystemTest);
+
+ protected:
+  void Mount();
+  void Unmount();
+  zx_status_t CheckFs();
+  virtual void CheckInfo() {}
+
+  FsTestType type_;
+  Environment* environment_;
+  std::string device_path_;
+  bool read_only_ = false;
+  bool mounted_ = false;
+};
+
+class FilesystemTestWithFvm : public FilesystemTest {
+ public:
+  FilesystemTestWithFvm() : FilesystemTest(FsTestType::kFvm) {}
+
+  // zxtest::Test interface:
+  void SetUp() override;
+  void TearDown() override;
+
+  const std::string& partition_path() const { return partition_path_; }
+
+  // Derived fixtures can define any slice size.
+  virtual size_t GetSliceSize() const { return 1 << 16; }
+
+  DISALLOW_COPY_ASSIGN_AND_MOVE(FilesystemTestWithFvm);
+
+ private:
+  void BindFvm();
+  void CreatePartition();
+  virtual void CheckPartitionSize() {}
+
+  std::string fvm_path_;
+  std::string partition_path_;
+};

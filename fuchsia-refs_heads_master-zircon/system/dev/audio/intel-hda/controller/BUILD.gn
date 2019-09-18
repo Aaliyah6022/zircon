@@ -1,0 +1,126 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx/public/gn/firmware.gni")
+import("$zx/public/gn/fuzzer.gni")
+
+# All non-test targets.
+group("controller") {
+  deps = [
+    ":intel-hda",
+  ]
+}
+
+# All test targets.
+group("test") {
+  testonly = true
+  deps = [
+    ":controller_test",
+    ":nhlt-fuzzer",
+  ]
+}
+
+source_set("src") {
+  visibility = [ ":*" ]
+  sources = [
+    "binary_decoder.h",
+    "codec-cmd-job.cc",
+    "codec-cmd-job.h",
+    "debug-logging.h",
+    "intel-dsp-code-loader.cc",
+    "intel-dsp-code-loader.h",
+    "intel-dsp-debug.cc",
+    "intel-dsp-ipc.cc",
+    "intel-dsp-ipc.h",
+    "intel-dsp-modules.cc",
+    "intel-dsp-modules.h",
+    "intel-dsp-stream.cc",
+    "intel-dsp-stream.h",
+    "intel-dsp-topology.cc",
+    "intel-dsp-topology.h",
+    "intel-dsp.cc",
+    "intel-dsp.h",
+    "intel-hda-codec.cc",
+    "intel-hda-codec.h",
+    "intel-hda-controller-init.cc",
+    "intel-hda-controller.cc",
+    "intel-hda-controller.h",
+    "intel-hda-debug.cc",
+    "intel-hda-irq.cc",
+    "intel-hda-stream.cc",
+    "intel-hda-stream.h",
+    "nhlt.cc",
+    "nhlt.h",
+    "utils.cc",
+    "utils.h",
+  ]
+  deps = [
+    "$zx/system/banjo/ddk.protocol.intelhda.codec",
+    "$zx/system/banjo/ddk.protocol.pci",
+    "$zx/system/fidl/fuchsia-hardware-intel-hda:c",
+    "$zx/system/ulib/audio-driver-proto",
+    "$zx/system/ulib/audio-proto-utils",
+    "$zx/system/ulib/dispatcher-pool",
+    "$zx/system/ulib/driver",
+  ]
+  public_deps = [
+    "$zx/system/ulib/ddk",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fit",
+    "$zx/system/ulib/fzl",
+    "$zx/system/ulib/intel-hda",
+    "$zx/system/ulib/refcount",
+    "$zx/system/ulib/sync",
+    "$zx/system/ulib/zircon",
+    "$zx/system/ulib/zircon-internal",
+    "$zx/system/ulib/zx",
+  ]
+}
+
+driver("intel-hda") {
+  deps = [
+    ":src",
+  ]
+  data_deps = [
+    ":firmware",
+  ]
+}
+
+test("controller_test") {
+  output_name = "intel-hda-controller-test"
+  testonly = true
+  sources = [
+    "binary_decoder_test.cc",
+    "intel-dsp-ipc-test.cc",
+    "intel-dsp-modules-test.cc",
+    "nhlt_test.cc",
+  ]
+  deps = [
+    ":src",
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/intel-hda",
+    "$zx/system/ulib/zx",
+    "$zx/system/ulib/zxtest",
+  ]
+}
+
+# Fuzz testing for NHLT parsing.
+#
+# Name needs to end with "-fuzzer" to be included in the Zircon fuzz test package.
+fuzzer("nhlt-fuzzer") {
+  sources = [
+    "nhlt_fuzzer.cc",
+  ]
+  deps = [
+    ":src",
+    "$zx/system/ulib/fbl",
+  ]
+}
+
+firmware("firmware") {
+  sources = [
+    "$firmware_dir/intel-adsp-sst/dsp_fw_kbl_v3420.bin",
+  ]
+}

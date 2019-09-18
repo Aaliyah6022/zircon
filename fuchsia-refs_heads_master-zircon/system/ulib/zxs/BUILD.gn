@@ -1,0 +1,16 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/library_shim.gni")
+
+library("zxs") {
+  sdk = "static"
+  sdk_headers = [ "lib/zxs/protocol.h" ]
+  sources = []
+  configs += [ "$zx_build/public/gn/config:visibility_hidden" ]
+  public_deps = [
+    # <lib/zxs/protocol.h> has #include <zircon/compiler.h>.
+    "$zx/system/ulib/zircon",
+  ]
+}

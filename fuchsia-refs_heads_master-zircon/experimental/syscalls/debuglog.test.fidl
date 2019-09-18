@@ -1,0 +1,22 @@
+// Copyright 2019 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+// !!! THIS FILE IS NOT YET USED !!!
+// See //zircon/system/public/zircon/syscalls.banjo.
+// !!! THIS FILE IS NOT YET USED !!!
+
+library zz;
+
+[Transport="Syscall"]
+protocol Debuglog {
+    // TODO(ZX-2967): handle == ZX_HANDLE_INVALID accepted.
+    [In0="handle<resource>:kind=ROOT"]
+    Create(handle<resource> resource, uint32 options) -> (status status, handle<debuglog> out);
+
+    [In0="handle<debuglog>:rights=WRITE"]
+    Write(handle<debuglog> handle, uint32 options, vector_void buffer) -> (status status);
+
+    [In0="handle<debuglog>:rights=READ"]
+    Read(handle<debuglog> handle, uint32 options, mutable_vector_void buffer) -> (status status);
+};

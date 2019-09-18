@@ -1,0 +1,61 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/library_shim.gni")
+import("$zx_build/public/gn/test_shim.gni")
+
+library("transaction") {
+  host = true
+  sources = []
+  static = true
+
+  sources = [
+    "block_transaction.cc",
+  ]
+
+  public_deps = [
+    "$zx/system/ulib/fbl:headers",
+    "$zx/system/ulib/fs/buffer:headers",
+    "$zx/system/ulib/fs/operation:headers",
+  ]
+
+  deps = [
+    "$zx/system/ulib/fbl",
+    "$zx/system/ulib/fs/operation",
+    "$zx/system/ulib/fdio",
+    "$zx/system/ulib/zircon-internal",
+  ]
+
+  if (is_fuchsia) {
+    sources += [
+      "writeback.cc",
+    ]
+
+    public_deps += [
+      "$zx/system/ulib/block-client:headers",
+      "$zx/system/ulib/fit:headers",
+    ]
+
+    deps += [
+      "$zx/system/ulib/zx",
+    ]
+  }
+}
+
+group("test") {
+  testonly = true
+  deps = [
+    ":fs-transaction",
+  ]
+}
+
+test("fs-transaction") {
+  sources = [
+    "test/writeback_test.cc",
+  ]
+  deps = [
+    ":transaction",
+    "$zx/system/ulib/zxtest",
+  ]
+}

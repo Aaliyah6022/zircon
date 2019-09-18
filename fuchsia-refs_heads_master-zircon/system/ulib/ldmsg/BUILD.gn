@@ -1,0 +1,32 @@
+# Copyright 2019 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("$zx_build/public/gn/library_shim.gni")
+
+library("ldmsg") {
+  sdk = "static"
+  sdk_headers = [ "ldmsg/ldmsg.h" ]
+  sources = [
+    "ldmsg.c",
+  ]
+  deps = [
+    "$zx/system/ulib/zircon",
+  ]
+
+  if (toolchain.base_environment == "user") {
+    # This library is used by libc, so suppress the circularity.
+    configs -= [ "$zx_build/public/gn/config:user" ]
+  }
+
+  # However, it uses <string.h> for memcpy.
+  deps += [ "$zx/system/ulib/c:headers" ]
+
+  # This code is called by the dynamic linker in early startup before
+  # fancy stacks have been set up.  So it can't rely on safe-stack or
+  # shadow-call-stack ABIs.
+  configs += [
+    "$zx_build/public/gn/config:no_safestack",
+    "$zx_build/public/gn/config:no-shadow-call-stack",
+  ]
+}
